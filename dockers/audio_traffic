@@ -1,0 +1,13 @@
+FROM python:3.7-alpine3.9
+RUN apk update
+RUN apk add ffmpeg
+
+RUN mkdir -p /traffic
+ADD assets/simulate_audio_traffic.py /traffic/simulate_audio_traffic.py
+ADD assets/audio.mp3 /traffic/audio.mp3
+
+RUN pip3 install bitstruct
+
+WORKDIR "/traffic/"
+ENTRYPOINT ["python3"]
+CMD ["simulate_audio_traffic.py"]

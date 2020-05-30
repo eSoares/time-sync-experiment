@@ -1,0 +1,20 @@
+FROM alpine:edge
+RUN apk update
+RUN apk add --update build-base curl tar 
+RUN apk add linux-headers
+RUN curl -L http://www.eecis.udel.edu/~ntp/ntp_spool/ntp4/ntp-4.2/ntp-4.2.8p13.tar.gz | tar xz
+RUN cd ntp-4.2.8p13; ./configure; make -j4; make install
+
+ADD assets/ntp_local_server.conf /etc/ntp.conf
+#RUN cat /etc/ntpd.conf
+#RUN ln -sf /dev/stdout /var/log/nginx/access.log
+#RUN ln -sf /dev/stderr /var/log/nginx/error.log
+RUN mkdir ntpstats
+
+# ntp port
+EXPOSE 123/udp
+
+#CMD ["/bin/bash"]
+ENTRYPOINT ["ntpd"]
+CMD ["-d", "-f", "/etc/ntp.conf"]
+

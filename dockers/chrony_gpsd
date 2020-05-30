@@ -1,0 +1,22 @@
+FROM alpine:edge
+RUN apk update
+RUN apk add --update build-base curl tar linux-headers scons ncurses5-libs python-dev git 
+
+# gps tools
+RUN curl -L http://download-mirror.savannah.gnu.org/releases/gpsd/gpsd-3.18.tar.gz | tar xz; cd gpsd-3.18; scons && scons udev-install
+RUN git clone https://github.com/redlab-i/pps-tools; cd pps-tools; make; make install
+
+# chrony
+RUN curl -L https://download.tuxfamily.org/chrony/chrony-3.5.tar.gz | tar xz; cd chrony-3.5; ./configure; make -j4; make install
+
+RUN mkdir ntpstats
+ADD assets/chrony_gpsd.conf chrony_gpsd.conf
+ADD assets/start_chrony_gpsd.sh start_chrony_gpsd.sh
+
+# ntp port
+EXPOSE 123/udp
+
+#CMD ["/bin/bash"]
+ENTRYPOINT ["sh"]
+CMD ["start_chrony_gpsd.sh"]
+

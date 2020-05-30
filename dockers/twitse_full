@@ -1,0 +1,22 @@
+FROM alpine:edge
+RUN apk update
+RUN apk add --update build-base curl tar cmake git
+RUN apk add linux-headers
+RUN git clone git://code.qt.io/qt/qt5.git; cd qt5; ./init-repository
+RUN cd qt5; ./configure -v -opengl es2 -device linux-rasp-pi-g''+ -device-option CROSS_COMPILE=/usr/bin/ -opensource -confirm-license -optimized-qmake -reduce-exports -release -qt-pcre -make libs -prefix /usr/local/qt5 &> output
+RUN cd qt5; make &> output_make; sudo make install &> output_make_install
+# add to PATH
+RUN PATH=$PATH:/usr/local/qt5/bin
+
+RUN git clone https://github.com/bjerrep/twitse.git
+RUN cd twitse; mkdir build && cd build; cmake .. -DCMAKE_BUILD_TYPE=release; make twitse_client; make twitse_server
+
+# todo
+#EXPOSE 123/udp
+
+CMD ["sh"]
+
+#ENTRYPOINT ["/twitse/build/server/server"]
+#ENTRYPOINT ["/twitse/build/client/twitse-client"]
+#CMD ["-d", "-f", "/etc/ntp.conf"]
+

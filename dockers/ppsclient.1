@@ -1,0 +1,7 @@
+FROM ppsclient.compiled
+
+# build pps-client
+ADD assets/start_ppsclient.sh start_ppsclient.sh
+ENTRYPOINT ["bash", "start_ppsclient.sh"]
+#ENTRYPOINT ["/usr/sbin/pps-client", "-v"]
+

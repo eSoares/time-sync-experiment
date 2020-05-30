@@ -1,0 +1,18 @@
+FROM alpine:edge
+RUN apk update
+RUN apk add --update build-base curl tar linux-headers scons ncurses5-libs python-dev git 
+
+# chrony
+RUN curl -L https://download.tuxfamily.org/chrony/chrony-3.5.tar.gz | tar xz; cd chrony-3.5; ./configure; make -j4; make install
+
+RUN mkdir ntpstats
+ADD assets/chrony_local_server.conf chrony_local_server.conf
+ADD assets/start_chrony_local_server.sh start_chrony_local_server.sh
+
+# ntp port
+EXPOSE 123/udp
+
+#CMD ["/bin/bash"]
+ENTRYPOINT ["sh"]
+CMD ["start_chrony_local_server.sh"]
+

@@ -1,0 +1,20 @@
+FROM alpine:edge
+RUN apk update
+RUN apk add --update build-base curl tar linux-headers bash scons ncurses-dev ncurses5-libs python-dev git perl libarchive-tools bison flex openssl-dev &&\
+    ln -sf $(which bsdtar) $(which tar)
+#RUN --mount=type=bind,source=/proc,target=/proc,rw
+#RUN --mount=type=bind,source=/boot,target=/boot,rw
+#RUN --mount=type=bind,source=/lib/modules,target=/lib/modules,rw
+
+# build kernel
+RUN wget https://raw.githubusercontent.com/notro/rpi-source/master/rpi-source -O /usr/bin/rpi-source &&\
+     sed -i 's/sudo//g' /usr/bin/rpi-source &&\
+     sed -i 's/--checkpoint=100 --checkpoint-action=dot//g' /usr/bin/rpi-source &&\
+     chmod +x /usr/bin/rpi-source
+
+# this needs to be under exec with right permission
+#RUN /usr/bin/rpi-source -q --tag-update
+#RUN /usr/bin/rpi-source -d ./ --nomake --delete
+#RUN cd /linux; KERNEL=kernel7; make bcm2709_defconfig
+#RUN cd /linux; make -j4 zImage
+

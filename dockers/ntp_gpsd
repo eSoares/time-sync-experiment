@@ -1,0 +1,20 @@
+FROM alpine:edge
+RUN apk update
+RUN apk add --update build-base curl tar linux-headers scons ncurses5-libs python-dev git
+
+# gps tools
+RUN curl -L http://download-mirror.savannah.gnu.org/releases/gpsd/gpsd-3.18.tar.gz | tar xz; cd gpsd-3.18; scons && scons udev-install
+RUN git clone https://github.com/redlab-i/pps-tools; cd pps-tools; make; make install
+
+# ntpd
+RUN curl -L http://www.eecis.udel.edu/~ntp/ntp_spool/ntp4/ntp-4.2/ntp-4.2.8p13.tar.gz | tar xz; cd ntp-4.2.8p13; ./configure; make -j4; make install
+
+ADD assets/ntp_gpsd.conf /etc/ntp.conf
+ADD assets/start_gps.sh /
+RUN mkdir ntpstats
+
+# ntp port
+EXPOSE 123/udp
+
+ENTRYPOINT ["./start_gps.sh"]
+
